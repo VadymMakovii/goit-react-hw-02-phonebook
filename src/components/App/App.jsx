@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
 import { ContactForm } from 'components/ContactForm/ContactForm';
 import { Container } from './App.styled';
@@ -17,7 +16,7 @@ export class App extends Component {
     filter: '',
   };
 
-  formSubmitHandler = ({ name, number }) => {
+  formSubmitHandler = ({ name, number }, reset) => {
     const contact = {
       id: nanoid(),
       name,
@@ -28,9 +27,12 @@ export class App extends Component {
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
 
-    return contactAudit
-      ? alert(`${name} is already in contacts.`)
-      : this.setState(({ contacts }) => ({ contacts: [contact, ...contacts] }));
+    if (!contactAudit) {
+      this.setState(({ contacts }) => ({ contacts: [contact, ...contacts] }));
+      reset();
+    } else {
+      alert(`${name} is already in contacts.`);
+    }
   };
 
   deleteContact = contactId => {
@@ -69,10 +71,3 @@ export class App extends Component {
     );
   }
 }
-
-App.propTypes = {
-  state: PropTypes.exact({
-    name: PropTypes.string.isRequired,
-    number: PropTypes.string.isRequired,
-  }),
-};
